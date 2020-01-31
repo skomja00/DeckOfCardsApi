@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Deck of Cards API</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body {
+                background-color: #00AA00;
+            }
+            h1 {
+                background-color: #DDDD00;
+                border: solid 1px black;
+                text-align: center;
+                padding: 1em;
+                margin: 1em;
+                
+            }
+            .button {
+                text-align: center;
+            }
+            .hand1 {
+                background-color: lightgreen;
+                border: solid 1px black;
+                padding: 1em;
+                margin: 1em;
+            }        
+            .hand2 {
+                background-color: lightgreen;
+                border: solid 1px black;
+                padding: 1em;
+                margin: 1em;
+            }        
+   
+        </style>
+    </head>
+    <body>
+        <div id="header">
+            <h1>
+                Deck of Cards API<br>
+                http://deckofcardsapi.com/
+            </h1>
+        </div>
+        <div id="deal" class="button">
+            <button id="buttonId" class="button" onclick="deal()">
+            </button>
+        </div>
+        <div id="content">
+            <div id="hand1" class="hand1">
+                <!-- hand 1 cards inserted here -->
+                <!-- <div id="listHere"></div> -->
+            </div>
+            <div id="hand2" class="hand2">
+                <!-- hand 2 cards inserted here -->
+                <!-- <div id="listHere"></div> -->
+            </div>
+        </div>
+        <script src="js/ajax.js" type="text/javascript"></script>
+        <script src="js/components/cards.js" type="text/javascript"></script>
+        <script>
+            "use strict";
+            function MakeDeckOfCards (params) {
+                var json = {};
+                json.url = params["url"] || "https://emptyUrl";
+                ajax(json["url"], processData, "listHere") ;
+                function processData (jsObj) {
+                    json.deckId = jsObj["deck_id"];
+                    json.json = jsObj;
+                    json.display();
+                }
+                json.display = function () {
+                    document.getElementById("buttonId").innerHTML = "Deal from DeckId: " + json.deckId;
+                };
+                return json;
+            };
+            function MakeHand (params) {
+                var contentId = params["handId"] || "listHere";
+                var handEle = document.getElementById(contentId);
+                var deckId = params["deckId"];
+                var numOfCards = params["numOfCards"] || 5;
+                var url = "https://deckofcardsapi.com/api/deck/" + deckId + "/draw/?count=" + numOfCards;
+                ajax(url, processData, "listHere") ;
+                function processData (jsonObj) {
+                    var hand = "<div id='listHere'>";
+                    hand += JSON.stringify(jsonObj);
+                    hand += "</div>";
+                    handEle.display(hand);
+                }
+                handEle.display = function (hand) {
+                    handEle.innerHTML = hand;                  
+                };
+                handEle.display();                
+            }
+            function MakeHandParams (handId) {
+                var json = {};
+                json.numOfCards = 5;
+                json.url = "https://deckofcardsapi.com/api/deck/" + deck["deckId"] + "/draw/?count=" + json["numOfCards"];
+                json.deckId = deck["deckId"];
+                json.handId = handId;
+                return json;
+            }
+            function deal() {
+                 var handParams = MakeHandParams("hand1");
+                 var hand1Obj = MakeHand(handParams);
+
+                 var handParams = MakeHandParams("hand2");
+                 var hand2Obj = MakeHand(handParams);
+            }
+            function shuffle (handId) {
+                /* TODO: shuffle the deck when the web api responds to deal() with 
+                 * "error":"Not enough cards remaining to draw 5 additional"
+                 * https://deckofcardsapi.com/api/deck/<<deck_id>>/shuffle/ */
+            }
+
+            /* Main program */
+            /* initialize some things */
+            var deckParams = {
+                url: "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_numOfCards=1"
+            };
+            var deck = MakeDeckOfCards(deckParams);
+            
+        </script>
+    </body>
+</html>
